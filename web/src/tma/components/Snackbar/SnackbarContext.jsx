@@ -1,0 +1,87 @@
+import { createContext, useContext, useEffect, useRef, useState } from "react"
+import PropTypes from "prop-types"
+import { useSplitViewContext } from "../SplitView/context"
+import SnackbarHost from "./SnackbarHost"
+import { triggerHaptic } from "./SnackbarItem"
+
+const SnackbarContext = createContext(null)
+
+/**
+ * Access the imperative snackbar API. Requires a `<SnackbarProvider>` ancestor
+ * (mount it once near the app root). `show` returns an id you can later pass to
+ * `dismiss`.
+ * @returns {{ show: (options: object) => number, dismiss: (id: number) => void }}
+ * @example
+ * const snackbar = useSnackbar()
+ * snackbar.show({
+ *   position: "bottom",         // "top" | "bottom"
+ *   icon: <ExclamationIcon />,
+ *   title: "Saved as draft",
+ *   description: "Swipe to dismiss.",
+ *   action: { label: "Undo" },  // or link: { label: "View" }
+ *   duration: 0,                // 0 = persistent
+ * })
+ */
+export const useSnackbar = () => {
+    const value = useContext(SnackbarContext)
+    const { paneRef } = useSplitViewContext()
+    if (!value) {
+        throw new Error("useSnackbar must be used inside <SnackbarProvider>")
+    }
+    return {
+        show: (options) => value.show({ ...options, pane: paneRef?.current }),
+        dismiss: value.dismiss,
+    }
+}
+
+export const SnackbarProvider = ({ children }) => {
+    const [snackbars, setSnackbars] = useState([])
+    const [panes, setPanes] = useState([])
+    const idRef = useRef(0)
+
+    useEffect(() => {
+        if (panes.length === 0) return
+        const prune = () => {
+            if (panes.every((pane) => pane.isConnected)) return
+            setPanes((curr) => curr.filter((pane) => pane.isConnected))
+        }
+        const observer = new MutationObserver(prune)
+        observer.observe(document.body, { childList: true, subtree: true })
+        prune()
+        return () => observer.disconnect()
+    }, [panes])
+
+    const dismiss = (id) => {
+        setSnackbars((curr) => curr.filter((s) => s.id !== id))
+    }
+
+    const show = (options) => {
+        idRef.current += 1
+        const id = idRef.current
+        const { pane, type } = options
+        triggerHaptic(type)
+        if (pane) {
+            setPanes((curr) => (curr.includes(pane) ? curr : [...curr, pane]))
+        }
+        setSnackbars((curr) => [
+            ...curr,
+            { id, ...options, createdAt: Date.now() },
+        ])
+        return id
+    }
+
+    return (
+        <SnackbarContext.Provider value={{ show, dismiss }}>
+            {children}
+            <SnackbarHost
+                snackbars={snackbars}
+                panes={panes}
+                onDismiss={dismiss}
+            />
+        </SnackbarContext.Provider>
+    )
+}
+
+SnackbarProvider.propTypes = {
+    children: PropTypes.node,
+}

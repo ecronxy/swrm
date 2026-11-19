@@ -1,0 +1,228 @@
+:root {
+    --cell-separator-height: 0.33px;
+    --image-cell-offset: 0;
+}
+
+// A cell that closes the visual list drops its separator, at any nesting
+// depth (TabContent slides, Collapsible content). Closing the list means
+// being the last sibling, or being followed only by a collapsed last sibling
+// that currently renders nothing (aria-hidden, e.g. a closed Collapsible).
+// Wrappers that sit mid-section re-arm the separator through
+// --last-cell-separator-height (see SectionList.module.scss).
+.root:last-child,
+.root:has(+ [aria-hidden="true"]:last-child) {
+    --cell-separator-height: var(--last-cell-separator-height, 0px);
+}
+
+button.root {
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    text-align: start;
+}
+
+.root {
+    display: flex;
+    flex-direction: row;
+    color: var(--tg-theme-text-color);
+    cursor: pointer;
+    text-decoration: none;
+
+    :global(.material) & {
+        --image-cell-offset: -6px;
+    }
+
+    .start {
+        display: flex;
+        align-items: center;
+
+        .image {
+            border-radius: 50%; corner-shape: round;
+
+            // Support both <img> and div with background-image
+            object-fit: contain;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .icon {
+            display: flex;
+            border-radius: 50%; corner-shape: round;
+            justify-content: center;
+            align-items: center;
+
+            svg,
+            path {
+                fill: white;
+            }
+        }
+    }
+
+    .body {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-grow: 1;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        border-bottom: var(--cell-separator-height) solid
+            var(--tg-theme-section-separator-color);
+    }
+
+    // Keeps its width next to a long title, but a long value of its own is
+    // capped at half the cell and its text (Text roots carry [variant]) cut
+    // with an ellipsis; switches and chevrons aren't clipped.
+    .end {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex-shrink: 0;
+        max-width: 50%;
+        padding: 0 0 0 8px;
+        padding-right: var(--side-padding);
+        text-align: right;
+        border-bottom: var(--cell-separator-height) solid
+            var(--tg-theme-section-separator-color);
+        white-space: nowrap;
+
+        [variant] {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .caption::first-letter {
+            text-transform: capitalize;
+        }
+
+        &.received .label,
+        &.received .caption {
+            color: var(--text-confirm-color);
+        }
+
+        &.failed .label,
+        &.failed .caption {
+            color: var(--tg-theme-destructive-text-color);
+        }
+    }
+
+    :global(.apple) & {
+        padding-left: var(--side-padding);
+        min-height: 44px;
+
+        .start {
+            padding: 12px 10px 12px 0;
+
+            .icon {
+                background: linear-gradient(
+                    156.88deg,
+                    #00e7ff 14.96%,
+                    #007aff 85.04%
+                );
+
+                &.icon_success {
+                    background: linear-gradient(180deg, #a0de7e 0%, #54cb68 100%);
+                }
+
+                &.icon_destructive {
+                    background: linear-gradient(180deg, #ff885e 0%, #ff516a 100%);
+                }
+            }
+
+            .icon,
+            .image {
+                width: 40px;
+                height: 40px;
+            }
+        }
+
+        .body {
+            min-height: 52px;
+            padding: 10px var(--side-padding) 9px 0;
+
+            > *:nth-child(2) {
+                margin-top: 1px;
+            }
+
+            > *:nth-child(3) {
+                margin-top: 1px;
+            }
+
+            &:has(> *:nth-child(3)) > *:nth-child(2) {
+                margin-top: 0;
+            }
+        }
+
+        .end {
+            gap: 1px;
+        }
+
+        &.alignTop .end {
+            padding-top: 9px;
+        }
+    }
+
+    :global(.material) & {
+        padding-left: var(--side-padding);
+        min-height: 50px;
+
+        .start {
+            padding: 7px 15px 7px 0;
+
+            .icon {
+                background: var(--tg-theme-button-color);
+
+                &.icon_success {
+                    background: #7bc862;
+                }
+
+                &.icon_destructive {
+                    background: #e17076;
+                }
+            }
+
+            .icon,
+            .image {
+                width: 42px;
+                height: 42px;
+                margin-left: -6px;
+            }
+        }
+
+        .body {
+            padding: 9px 12px 9px 0;
+
+            > *:nth-child(2) {
+                margin-top: 2px;
+            }
+
+            > *:nth-child(3) {
+                margin-top: 1px;
+            }
+
+            &:has(> *:nth-child(3)) > *:nth-child(2) {
+                margin-top: 0;
+            }
+        }
+
+        .end {
+            gap: 2px;
+        }
+
+        &.alignTop .end {
+            padding-top: 9px;
+        }
+    }
+}
+
+.alignTop {
+    .start {
+        align-items: flex-start;
+    }
+
+    .end {
+        justify-content: flex-start;
+    }
+}

@@ -1,0 +1,94 @@
+/* t3code's stylesheet stays for the message timeline (markdown, code, diffs).
+   The chrome (sidebar, composer, header) is built from the TIER kit and its tokens. */
+@import "./t3.css";
+@import "./motion.css";
+@source "../";
+
+/* mokaGram palette: bg #1c1c1c, cards #282828, hover #323232, accent #0a84ff,
+   captions #8e8e93, chat #151515. Radii: windows 28, cards 22, controls are pills. */
+:root.dark.dark {
+  --background: #151515;
+  --card: #282828;
+  --popover: #282828;
+  --message-surface: #0a84ff;
+  --foreground: #fff;
+  --muted-foreground: #8e8e93;
+  --border: rgb(255 255 255 / 8%);
+  --sidebar: #1c1c1c;
+}
+.swrm.tma[data-color-scheme="dark"] {
+  --moka-bg: #1c1c1c;
+  --moka-card: #282828;
+  --moka-hover: #323232;
+  --moka-accent: #0a84ff;
+  --moka-muted: #8e8e93;
+  --moka-chat: #151515;
+  --tg-theme-bg-color: #151515;
+  --tg-theme-secondary-bg-color: #1c1c1c;
+  --tg-theme-section-bg-color: #282828;
+  --tg-theme-button-color: #0a84ff;
+  --tg-theme-accent-text-color: #0a84ff;
+  --tg-theme-link-color: #0a84ff;
+  --tg-theme-hint-color: #8e8e93;
+  --tg-theme-subtitle-text-color: #8e8e93;
+  --tg-theme-section-header-text-color: #8e8e93;
+}
+
+html, body, #app { height: 100%; background: #151515; }
+body { margin: 0; }
+
+.swrm {
+  height: 100dvh;
+  background: var(--moka-chat);
+  font-family: "Inter Variable", -apple-system, system-ui, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+}
+.swrm [variant] { font-family: inherit; }
+/* Chrome is not selectable, what Claude wrote and you typed is. */
+.swrm [data-chrome], .swrm [data-chrome] * { user-select: none; -webkit-user-select: none; }
+.swrm input, .swrm textarea { user-select: text; -webkit-user-select: text; }
+.swrm .chat-markdown, .swrm .chat-markdown * { font-family: inherit; }
+.swrm code, .swrm pre, .swrm pre * { font-family: var(--font-mono); }
+
+/* No scrollbars anywhere, scrolling stays. */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { display: none; }
+
+/* Glass recipe of the kit's TabBar (patterns/wallet-home.jsx TABBAR_GLASS). */
+.tab-glass {
+  position: relative;
+  background: rgb(from var(--tg-theme-section-bg-color) r g b / 70%);
+  backdrop-filter: saturate(300%) blur(8px);
+  -webkit-backdrop-filter: saturate(300%) blur(8px);
+  box-shadow: 0 0 10px 0 rgb(0 0 0 / 10%);
+}
+.tab-glass > .tab-glass-tint {
+  position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  background: rgb(from var(--quaternary-fill-background) r g b / 4%);
+}
+
+.ico { width: 1em; height: 1em; flex-shrink: 0; }
+
+/* Lists dissolve at their edges instead of being cut by the header. */
+.scroll-fade {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+}
+
+/* iOS squircle corners everywhere, capsules and circles included.
+   squircle = superellipse(2) looks squarer than the old round arc at the same radius;
+   superellipse(1.5) keeps the continuous iOS curve but stays visibly round. */
+*, *::before, *::after { corner-shape: superellipse(1.5); }
+/* capsules and circles must stay fully round: a squircle end turns a capsule into a box */
+.rounded-full, [class*="rounded-full"], [class*="rounded-full"]::before, [class*="rounded-full"]::after { corner-shape: round; }
+
+/* send button: the kit rim (GlassBorder) must be a true circle, and the glyph stays plain white on the accent fill */
+[data-send], [data-send] *, [data-send] *::before, [data-send] *::after { corner-shape: round; }
+[data-send] span { mix-blend-mode: normal !important; }
+
+/* WebKitGTK has no working backdrop-filter, so the kit's 5% white glass would show the text behind it
+   unblurred. In this app the glass tint is a near-opaque dark surface instead. */
+.tma[data-color-scheme="dark"].swrm { --glass-tint-background: rgb(46 46 48 / 0.98); }
+
+/* A menu taller than the window (the model list in a small window) scrolls instead of running off the top. */
+.tma [role="menu"] { max-height: calc(100dvh - 24px); overflow-y: auto; overscroll-behavior: contain; }

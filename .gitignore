@@ -1,0 +1,45 @@
+# зависимости и сборка
+node_modules/
+dist/
+release/
+shell/target/
+*.AppImage
+*.AppDir/
+
+# секреты и аккаунты Claude
+.env
+.env.*
+*.pem
+*.key
+.credentials.json
+.claude.json
+.claude/
+.claude2/
+config.json
+
+# данные swrm: чаты, сессии, вложения, worktrees
+.local/
+chats/
+sessions-index.json
+state.json
+attachments/
+worktrees/
+scratchpad/
+
+# логи и дампы
+*.log
+*.pid
+core
+core.*
+coverage/
+.vite/
+.cache/
+*.tsbuildinfo
+
+# мусор ОС и редакторов
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~

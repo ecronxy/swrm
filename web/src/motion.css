@@ -1,0 +1,80 @@
+/* Motion copied 1:1 from the owner's references, nothing invented:
+   sdkhub.org  - rise / cell rise / note pop, buttons (bg .15s ease, transform .2s spring, :active scale)
+   keeperwallet.com - blur reveal (.m1vhixft), deep reveal, banner reveal (grid 0fr -> 1fr) */
+:root {
+  --ease-hub: cubic-bezier(0.22, 0.8, 0.28, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-keeper: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* sdkhub _rise: nav, heads, channel */
+@keyframes hub-rise { 0% { opacity: 0; transform: translateY(6px); } }
+@keyframes hub-rise-down { 0% { opacity: 0; transform: translateY(-6px); } }
+.rise { animation: hub-rise 0.5s var(--ease-hub) backwards; }
+.rise-down { animation: hub-rise-down 0.5s var(--ease-hub) 40ms backwards; }
+
+/* sdkhub cells: .4s, translateY(6px), stagger --i * 25ms */
+@keyframes hub-cell { 0% { opacity: 0; transform: translateY(6px); } }
+.rise-cell { animation: hub-cell 0.4s var(--ease-hub) calc(var(--i, 0) * 25ms) backwards; }
+
+/* sdkhub _note: anchored popovers */
+@keyframes hub-note { 0% { opacity: 0; scale: 0.96; } }
+.note { animation: hub-note 0.22s var(--ease-hub) both; }
+
+/* sdkhub tr-swap: text that changes */
+@keyframes hub-swap { 0% { opacity: 0; transform: translateY(4px); } }
+.swap { display: inline-block; animation: hub-swap 0.42s var(--ease-hub) backwards; }
+
+/* keeper .m1vhixft -> .visible, as a mount animation */
+@keyframes keeper-reveal { 0% { opacity: 0; transform: translateY(18px) scale(0.985); } }
+@keyframes keeper-reveal-deep { 0% { opacity: 0; transform: translateY(26px) scale(0.94); } }
+.reveal { animation: keeper-reveal 0.7s var(--ease-keeper) backwards; }
+.reveal-deep { animation: keeper-reveal-deep 0.9s var(--ease-keeper) backwards; }
+
+/* keeper banner: space opens by grid rows, content drops in */
+@keyframes keeper-space { 0% { grid-template-rows: 0fr; } 100% { grid-template-rows: 1fr; } }
+@keyframes keeper-content { 0% { opacity: 0; transform: translateY(-12px); } }
+.banner { display: grid; animation: keeper-space 0.56s var(--ease-keeper) both; }
+.banner > * { min-height: 0; overflow: hidden; animation: keeper-content 0.56s var(--ease-keeper) both; }
+
+/* Same banner idea as a toggle: open/close by grid rows. */
+.fold { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.56s var(--ease-keeper); }
+.fold > * { min-height: 0; overflow: hidden; opacity: 0; transform: translateY(-12px); transition: opacity 0.36s ease, transform 0.56s var(--ease-keeper); }
+.fold-up > * { transform: translateY(12px); } /* card grows upward, header stays put */
+.fold[data-open] { grid-template-rows: 1fr; }
+.fold[data-open] > * { opacity: 1; transform: none; }
+
+/* sdkhub buttons */
+.press { transition: background-color 0.15s ease, color 0.15s ease, transform 0.2s var(--ease-spring); will-change: transform; backface-visibility: hidden; } /* own layer: label stays on one raster, no re-snap jump when the press scale starts and ends */
+.press:active:not(:disabled) { transform: scale(0.97); }
+.press-icon:active:not(:disabled) { transform: scale(0.92); }
+/* sdkhub cards: hover tint only */
+.card-hover { transition: background-color 0.15s ease; }
+
+.spin-chevron { transition: transform 0.2s var(--ease-spring); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .rise-down, .rise-cell, .note, .swap, .reveal, .reveal-deep, .banner, .banner > * { animation: none; }
+  .fold, .fold > *, .press, .spin-chevron { transition: none; }
+}
+
+/* sdkhub _overlay: fade .2s ease */
+@keyframes hub-fade { 0% { opacity: 0; } }
+.palette-overlay { animation: hub-fade 0.2s ease; }
+@media (prefers-reduced-motion: reduce) { .palette-overlay { animation: none; } }
+
+/* send button: calm when empty, the arrow rises in when there is something to send. No glow, ever. */
+.send-btn { transition: background-color 0.15s ease, color 0.15s ease, transform 0.2s var(--ease-spring); }
+@keyframes send-arrow { 0% { opacity: 0; transform: translateY(5px); } }
+.send-arrow { animation: send-arrow 0.28s var(--ease-hub) backwards; }
+
+/* attachments: a thumbnail pops in above the composer and shrinks out when removed (no glow) */
+@keyframes hub-thumb-in { 0% { opacity: 0; scale: 0.8; } }
+.thumb-in { animation: hub-thumb-in 0.24s var(--ease-spring) backwards; }
+.thumb-out { opacity: 0; scale: 0.8; transition: opacity 0.16s ease, scale 0.16s var(--ease-hub); pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .thumb-in { animation: none; } .thumb-out { transition: none; } }
+
+/* Search hit: a short tint on the message that was jumped to (sessions.jsx). */
+@keyframes hub-hit { 0% { background-color: rgb(10 132 255 / 26%); } 100% { background-color: transparent; } }
+.hit-flash { border-radius: 14px; animation: hub-hit 1.6s ease-out both; }
+@media (prefers-reduced-motion: reduce) { .hit-flash { animation: none; } }

@@ -1,0 +1,99 @@
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+    padding-bottom: 16px;
+    background-color: var(--tg-theme-secondary-bg-color);
+
+    section {
+        display: flex;
+        flex-direction: column;
+        align-self: stretch;
+
+        .card {
+            display: flex;
+            flex-direction: column;
+            align-self: stretch;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-self: stretch;
+        }
+
+        // The section's closing cell hides its own separator (Cell.module.scss
+        // keys off :last-child); wrappers on the last-child chain pass that
+        // down by inheritance. Anything off the chain sits mid-list (e.g. the
+        // Wallet small-assets group with a button after it), so its own last
+        // cell re-arms the separator. A trailing aria-hidden sibling (a closed
+        // Collapsible) renders nothing, so it does not count as content after.
+        .container :not(:last-child, :has(+ [aria-hidden="true"]:last-child)) {
+            --last-cell-separator-height: var(--cell-separator-height);
+        }
+    }
+
+    :global(.apple) & {
+        // iOS 26 grouped-list rhythm. The spec measures text to card, so every
+        // gap that meets a header or footer subtracts the padding that text
+        // carries — kept as a variable so the two can't drift apart.
+        --header-text-inset: 10px;
+
+        padding: 0 16px 20px;
+        gap: 0;
+
+        > * + * {
+            margin-top: 35px;
+        }
+
+        > * + [data-header] {
+            margin-top: calc(28px - var(--header-text-inset));
+        }
+
+        > [data-footer] + * {
+            margin-top: calc(24px - var(--header-text-inset));
+        }
+
+        > [data-footer] + [data-header] {
+            margin-top: calc(16px - var(--header-text-inset) * 2);
+        }
+
+        > :first-child:not([data-header]) {
+            margin-top: 20px;
+        }
+
+        section .container {
+            background-color: var(--tg-theme-section-bg-color);
+            border-radius: 26px;
+            overflow: hidden;
+        }
+
+        &.grouped {
+            padding-inline: 0;
+
+            section .container {
+                border-radius: 0;
+            }
+        }
+    }
+
+    :global(.material) & {
+        padding: 12px;
+        gap: 12px;
+
+        section .card {
+            background-color: var(--tg-theme-section-bg-color);
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        &.grouped {
+            padding-inline: 0;
+
+            section .card {
+                border-radius: 0;
+            }
+        }
+    }
+}

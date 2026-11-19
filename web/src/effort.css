@@ -1,0 +1,38 @@
+/* Effort slider: wide rail, white thumb, coral fill that gets deeper with every step.
+   Moves by transform only (compositor), nothing is laid out while dragging.
+   --p is the thumb position 0..1, set inline. */
+.eff {
+  --th: 22px; --pad: 3px; --p: 0;
+  --travel: calc(100% - var(--th) - 2 * var(--pad));
+  position: relative; height: 28px; border-radius: 14px; background: #1b1b1b;
+  cursor: pointer; touch-action: none; outline: none; overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* a full-length bar slid left until its end sits under the thumb: its round end stays round */
+.eff-fill {
+  position: absolute; inset: 0; border-radius: 14px;
+  transform: translateX(calc((var(--p) - 1) * (100% - var(--th) - 2 * var(--pad))));
+  transition: transform 0.18s var(--ease-hub), background-color 0.18s ease;
+}
+
+.eff-thumb {
+  position: absolute; top: var(--pad); left: var(--pad); width: var(--th); height: var(--th); border-radius: 50%;
+  background: #fff; box-shadow: 0 1px 4px rgb(0 0 0 / 35%); cursor: grab;
+  transform: translateX(calc(var(--p) * (100cqw - var(--th) - 2 * var(--pad))));
+  transition: transform 0.18s var(--ease-hub);
+}
+.eff { container-type: inline-size; }
+.eff[data-drag] .eff-thumb { cursor: grabbing; }
+
+/* steps: equal ticks, the passed ones light up */
+.eff-dot {
+  position: absolute; border-radius: 0; will-change: transform;
+  background: rgb(255 255 255 / 14%); transition: background-color 0.2s ease;
+}
+.eff-dot[data-on] { background: rgb(255 255 255 / 65%); }
+
+.eff-panel { animation: hub-rise 0.4s var(--ease-hub) backwards; }
+
+/* circles and pills stay truly round, the global squircle would square the thumb */
+.eff, .eff-fill, .eff-thumb, .eff-dot { corner-shape: round; }
